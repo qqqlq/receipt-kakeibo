@@ -24,13 +24,14 @@ function base64url(buffer) {
  * 環境変数では改行が \n でエスケープされているため置換する
  */
 function pemToArrayBuffer(pem) {
-  const pemBody = pem
+  // \n リテラルと実改行の両方に対応し、base64 文字以外を全て除去する
+  const base64 = pem
     .replace(/\\n/g, '\n')
-    .replace(/-----BEGIN PRIVATE KEY-----/, '')
-    .replace(/-----END PRIVATE KEY-----/, '')
-    .replace(/\s+/g, '')
+    .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+    .replace(/-----END PRIVATE KEY-----/g, '')
+    .replace(/[^A-Za-z0-9+/=]/g, '')
 
-  const binary = atob(pemBody)
+  const binary = atob(base64)
   const buffer = new Uint8Array(binary.length)
   for (let i = 0; i < binary.length; i++) {
     buffer[i] = binary.charCodeAt(i)
