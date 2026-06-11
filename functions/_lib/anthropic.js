@@ -4,13 +4,24 @@
  */
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
-const MODEL = 'claude-haiku-4-5-20251001'
+const MODEL = 'claude-sonnet-4-6'
 
 const CATEGORIES = '食費 / 外食 / 日用品 / 交通費 / 娯楽 / その他'
 
-const PROMPT_TEXT = `日本語のレシート画像です。以下のJSON形式のみで返してください（説明文・コードブロック不要）。
-カテゴリは「${CATEGORIES}」から最適なものを1つ選んでください。
+const PROMPT_TEXT = `日本語のレシート画像を解析してください。画像が横向きや斜めに撮影されている場合も、正しく読み取ってください。
 
+【読み取りルール】
+- storeName: 店名（レシート上部または店舗名欄から読み取る）
+- date: 購入日（YYYY-MM-DD形式。レシートに記載の日付を使用。年の記載がない場合は西暦で補完）
+- category: 「${CATEGORIES}」から最適なものを1つ選ぶ
+- items: 購入した各品目のリスト
+  - name: 商品名（レシートの文字をそのまま読む）
+  - price: 商品の金額（整数、¥や円は除く）。必ず各品目の実際の金額を読み取ること。読めない場合でも推測せず0にする
+  - ★小計・合計・税・値引きなどの行はitemsに含めない
+- total: レシート末尾の合計金額（税込・整数）
+- tax: 消費税額（記載があれば整数、なければ0）
+
+以下のJSON形式のみで返してください（説明文・コードブロック・改行不要）:
 {"storeName":"","date":"YYYY-MM-DD","category":"食費","items":[{"name":"","price":0}],"total":0,"tax":0}`
 
 /**
