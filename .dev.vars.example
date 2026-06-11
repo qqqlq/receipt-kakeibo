@@ -1,0 +1,8 @@
+# Cloudflare Pages Functions 環境変数サンプル
+# このファイルをコピーして .dev.vars を作成し、実際の値を入力する
+# .dev.vars は .gitignore に含まれているため Git にはコミットしない
+
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxx
+GOOGLE_SERVICE_ACCOUNT_EMAIL=your-service-account@your-project.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nxxxxxxxx\n-----END PRIVATE KEY-----\n"
+SPREADSHEET_ID=1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

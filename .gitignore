@@ -1,0 +1,20 @@
+# 依存関係
+node_modules/
+
+# ビルド成果物
+dist/
+.wrangler/
+
+# 環境変数・Secret（絶対にコミットしない）
+.env
+.env.local
+.env.*.local
+.dev.vars
+
+# ドキュメント（ローカル管理）
+docs/
+
+# エディタ・OS
+.DS_Store
+.vscode/
+*.local
