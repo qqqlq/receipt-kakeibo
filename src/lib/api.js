@@ -57,3 +57,39 @@ export async function getHistory() {
   const data = await res.json()
   return data.rows ?? []
 }
+
+// ─── サブスク API ────────────────────────────────────────────────────────────
+
+export async function getSubscriptions() {
+  const res = await fetch('/api/subscriptions')
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }))
+    throw new Error(err.error ?? 'サブスクの取得に失敗しました')
+  }
+  const data = await res.json()
+  return data.subscriptions ?? []
+}
+
+export async function addSubscription(data) {
+  const res = await fetch('/api/subscriptions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }))
+    throw new Error(err.error ?? 'サブスクの追加に失敗しました')
+  }
+}
+
+export async function disableSubscription(rowNumber) {
+  const res = await fetch('/api/subscriptions/disable', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rowNumber }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }))
+    throw new Error(err.error ?? 'サブスクの削除に失敗しました')
+  }
+}

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { ReceiptUploader } from './components/ReceiptUploader.jsx'
 import { ReceiptPreview } from './components/ReceiptPreview.jsx'
 import { HistoryList } from './components/HistoryList.jsx'
+import { SubscriptionManager } from './components/SubscriptionManager.jsx'
 import { compressImage } from './lib/image.js'
 import { parseReceipt, saveToSheets } from './lib/api.js'
 
@@ -10,7 +11,7 @@ import { parseReceipt, saveToSheets } from './lib/api.js'
  * idle → uploading → reviewing → saving → done → idle
  */
 
-const TABS = { home: 'ホーム', history: '履歴' }
+const TABS = { home: 'ホーム', history: '履歴', subscription: 'サブスク' }
 
 export default function App() {
   const [phase, setPhase] = useState('idle') // idle | uploading | reviewing | saving | done
@@ -143,6 +144,7 @@ export default function App() {
         )}
 
         {activeTab === 'history' && <HistoryList />}
+        {activeTab === 'subscription' && <SubscriptionManager />}
       </main>
 
       {/* トースト通知 */}
