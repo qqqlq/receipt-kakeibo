@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getSubscriptions, addSubscription, disableSubscription } from '../lib/api.js'
 
-const CATEGORIES = ['食費', '外食', '日用品', '交通費', '娯楽', 'その他']
+const CATEGORIES = ['食費', '外食', '日用品', '交通費', '娯楽', '開発', '光熱費', 'その他']
 
 /**
  * サブスク管理コンポーネント

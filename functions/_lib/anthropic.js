@@ -6,7 +6,7 @@
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-sonnet-4-6'
 
-const CATEGORIES = '食費 / 外食 / 日用品 / 交通費 / 娯楽 / その他'
+const CATEGORIES = '食費 / 外食 / 日用品 / 交通費 / 娯楽 / 開発 / 光熱費 / その他'
 
 const PROMPT_TEXT = `日本語のレシート画像を解析してください。画像が横向きや斜めに撮影されている場合も、正しく読み取ってください。
 
