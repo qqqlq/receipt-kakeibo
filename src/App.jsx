@@ -57,6 +57,22 @@ export default function App() {
     }
   }, [])
 
+  /** 手動入力：空データで確認画面を開く */
+  const handleManualInput = useCallback(() => {
+    setError(null)
+    // JST の今日の日付を YYYY-MM-DD で取得
+    const today = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Tokyo' })
+    setReceiptData({
+      storeName: '',
+      date: today,
+      category: 'その他',
+      items: [{ name: '', price: 0 }],
+      total: 0,
+      tax: 0,
+    })
+    setPhase('reviewing')
+  }, [])
+
   /** やり直し */
   const handleReset = useCallback(() => {
     setPhase('idle')
@@ -105,7 +121,7 @@ export default function App() {
 
             {/* ステートに応じた表示 */}
             {(phase === 'idle' || phase === 'uploading') && (
-              <ReceiptUploader onRead={handleRead} isLoading={isUploading} />
+              <ReceiptUploader onRead={handleRead} onManualInput={handleManualInput} isLoading={isUploading} />
             )}
 
             {(phase === 'reviewing' || phase === 'saving') && receiptData && (

@@ -7,7 +7,7 @@ import { useRef, useState } from 'react'
  * - 選択後プレビュー表示
  * - 「読み取る」ボタンで親コンポーネントに処理を委譲
  */
-export function ReceiptUploader({ onRead, isLoading }) {
+export function ReceiptUploader({ onRead, onManualInput, isLoading }) {
   const cameraInputRef = useRef(null)
   const galleryInputRef = useRef(null)
   const [preview, setPreview] = useState(null)
@@ -74,6 +74,16 @@ export function ReceiptUploader({ onRead, isLoading }) {
           🖼 ギャラリー
         </button>
       </div>
+
+      {/* 手動入力ボタン */}
+      <button
+        type="button"
+        onClick={onManualInput}
+        disabled={isLoading}
+        className="w-full max-w-sm min-h-[44px] border border-gray-300 hover:bg-gray-50 text-gray-600 font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors"
+      >
+        ✍️ 手入力
+      </button>
 
       {/* プレビュー */}
       {preview && (
