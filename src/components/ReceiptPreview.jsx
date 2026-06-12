@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const CATEGORIES = ['食費', '外食', '日用品', '交通費', '娯楽', '開発', '光熱費', 'その他']
+import { CATEGORIES } from '../lib/constants.js'
 
 /**
  * レシート読み取り結果の確認・編集コンポーネント
