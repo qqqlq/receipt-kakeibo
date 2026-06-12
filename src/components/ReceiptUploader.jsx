@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { MdCameraAlt, MdPhoto, MdEditNote, MdDocumentScanner } from 'react-icons/md'
 
 /**
  * レシートのアップロード・撮影コンポーネント
@@ -61,17 +62,17 @@ export function ReceiptUploader({ onRead, onManualInput, isLoading }) {
           type="button"
           onClick={() => cameraInputRef.current?.click()}
           disabled={isLoading}
-          className="flex-1 min-h-[44px] bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors"
+          className="flex-1 min-h-[44px] bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
         >
-          📷 カメラで撮影
+          <MdCameraAlt className="text-lg" /> カメラで撮影
         </button>
         <button
           type="button"
           onClick={() => galleryInputRef.current?.click()}
           disabled={isLoading}
-          className="flex-1 min-h-[44px] bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800 font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors"
+          className="flex-1 min-h-[44px] bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-800 font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
         >
-          🖼 ギャラリー
+          <MdPhoto className="text-lg" /> ギャラリー
         </button>
       </div>
 
@@ -80,9 +81,9 @@ export function ReceiptUploader({ onRead, onManualInput, isLoading }) {
         type="button"
         onClick={onManualInput}
         disabled={isLoading}
-        className="w-full max-w-sm min-h-[44px] border border-gray-300 hover:bg-gray-50 text-gray-600 font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors"
+        className="w-full max-w-sm min-h-[44px] border border-gray-300 hover:bg-gray-50 text-gray-600 font-medium rounded-lg px-4 py-3 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
       >
-        ✍️ 手入力
+        <MdEditNote className="text-lg" /> 手入力
       </button>
 
       {/* プレビュー */}
@@ -115,7 +116,7 @@ export function ReceiptUploader({ onRead, onManualInput, isLoading }) {
                   読み取り中…
                 </>
               ) : (
-                '✨ 読み取る'
+                <><MdDocumentScanner className="text-lg" /> 読み取る</>
               )}
             </button>
           </div>

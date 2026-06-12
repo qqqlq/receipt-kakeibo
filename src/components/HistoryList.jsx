@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { MdListAlt } from 'react-icons/md'
 import { getHistory } from '../lib/api.js'
 
 /**
@@ -51,7 +52,7 @@ export function HistoryList() {
   if (rows.length === 0) {
     return (
       <div className="p-8 text-center text-gray-400">
-        <p className="text-4xl mb-3">📋</p>
+        <MdListAlt className="text-5xl mb-3 mx-auto" />
         <p>まだ記録がありません</p>
       </div>
     )

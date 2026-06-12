@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { MdInbox, MdDeleteOutline } from 'react-icons/md'
 import { getSubscriptions, addSubscription, disableSubscription } from '../lib/api.js'
 import { CATEGORIES, PAYMENT_METHODS } from '../lib/constants.js'
 
@@ -91,7 +92,7 @@ export function SubscriptionManager() {
         </div>
       ) : subscriptions.length === 0 ? (
         <div className="py-8 text-center text-gray-400">
-          <p className="text-3xl mb-2">📭</p>
+          <MdInbox className="text-4xl mb-2 mx-auto" />
           <p>登録済みのサブスクはありません</p>
         </div>
       ) : (
@@ -117,7 +118,7 @@ export function SubscriptionManager() {
                 className="min-h-[44px] px-3 text-red-400 hover:text-red-600 transition-colors"
                 aria-label="削除"
               >
-                🗑
+                <MdDeleteOutline className="text-xl" />
               </button>
             </div>
           ))}

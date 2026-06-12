@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { MdReceipt, MdCheckCircle } from 'react-icons/md'
 import { ReceiptUploader } from './components/ReceiptUploader.jsx'
 import { ReceiptPreview } from './components/ReceiptPreview.jsx'
 import { HistoryList } from './components/HistoryList.jsx'
@@ -88,7 +89,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* ヘッダー */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center">
-        <h1 className="text-lg font-bold text-gray-900">🧾 レシート家計簿</h1>
+        <h1 className="text-lg font-bold text-gray-900 flex items-center gap-1"><MdReceipt className="text-xl" /> レシート家計簿</h1>
       </header>
 
       {/* タブ */}
@@ -136,7 +137,7 @@ export default function App() {
 
             {phase === 'done' && (
               <div className="flex flex-col items-center justify-center py-16 gap-4">
-                <p className="text-5xl">✅</p>
+                <MdCheckCircle className="text-6xl text-green-500" />
                 <p className="text-gray-700 font-medium">記録完了！</p>
               </div>
             )}

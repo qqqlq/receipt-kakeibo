@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { MdAddChart } from 'react-icons/md'
 import { CATEGORIES, PAYMENT_METHODS } from '../lib/constants.js'
 
 /**
@@ -174,7 +175,7 @@ export function ReceiptPreview({ data, onSave, onReset, isSaving }) {
               保存中…
             </>
           ) : (
-            '📊 スプレッドシートに追加'
+            <><MdAddChart className="text-lg" /> スプレッドシートに追加</>
           )}
         </button>
       </div>
