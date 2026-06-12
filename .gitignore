@@ -18,3 +18,9 @@ docs/
 .DS_Store
 .vscode/
 *.local
+
+# スクリーンショット・画像ファイル
+*.png
+*.jpg
+*.jpeg
+*.heic
