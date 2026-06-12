@@ -193,3 +193,70 @@ export async function readRows(env) {
     recordedAt: recordedAt ?? '',
   }))
 }
+
+// ─── サブスク管理 ────────────────────────────────────────────────────────────
+
+const SUBS_RANGE = 'subscriptions!A:E'
+
+/**
+ * サブスクを subscriptions タブに追加する
+ * カラム: サービス名 | 金額 | カテゴリ | 課金日 | 有効
+ */
+export async function addSubscription(env, { name, amount, category, billingDay }) {
+  const token = await getAccessToken(env)
+  const values = [[name, amount, category, billingDay, 'TRUE']]
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/${encodeURIComponent(SUBS_RANGE)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values }),
+  })
+  if (!res.ok) throw new Error(`サブスク追加失敗 (${res.status}): ${await res.text()}`)
+  return res.json()
+}
+
+/**
+ * 有効なサブスク一覧を取得する
+ * 各行にシート行番号（論理削除用）を付けて返す
+ */
+export async function readSubscriptions(env) {
+  const token = await getAccessToken(env)
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/${encodeURIComponent(SUBS_RANGE)}`
+
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (!res.ok) throw new Error(`サブスク取得失敗 (${res.status}): ${await res.text()}`)
+
+  const data = await res.json()
+  const rows = data.values ?? []
+
+  // 1行目はヘッダー。index + 2 がシート行番号
+  return rows.slice(1)
+    .map(([name, amount, category, billingDay, enabled], index) => ({
+      rowNumber: index + 2,
+      name: name ?? '',
+      amount: Number(amount) || 0,
+      category: category ?? '',
+      billingDay: Number(billingDay) || 1,
+      enabled: enabled !== 'FALSE',
+    }))
+    .filter((s) => s.enabled)
+}
+
+/**
+ * サブスクを論理削除する（有効列を FALSE に更新）
+ * @param {number} rowNumber - シート行番号（readSubscriptions で取得した値）
+ */
+export async function disableSubscription(env, rowNumber) {
+  const token = await getAccessToken(env)
+  const range = encodeURIComponent(`subscriptions!E${rowNumber}`)
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/${range}?valueInputOption=USER_ENTERED`
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [['FALSE']] }),
+  })
+  if (!res.ok) throw new Error(`サブスク削除失敗 (${res.status}): ${await res.text()}`)
+  return res.json()
+}

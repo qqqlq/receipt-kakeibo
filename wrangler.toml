@@ -4,3 +4,6 @@ main = "worker/index.js"
 
 [assets]
 directory = "./dist"
+
+[triggers]
+crons = ["0 0 * * *"]
