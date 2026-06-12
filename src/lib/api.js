@@ -71,6 +71,7 @@ export async function getSubscriptions() {
 }
 
 export async function addSubscription(data) {
+  // data: { name, amount, category, billingType, billingDay, billingMonth }
   const res = await fetch('/api/subscriptions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

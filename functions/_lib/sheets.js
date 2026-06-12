@@ -196,15 +196,17 @@ export async function readRows(env) {
 
 // ─── サブスク管理 ────────────────────────────────────────────────────────────
 
-const SUBS_RANGE = 'subscriptions!A:E'
+const SUBS_RANGE = 'subscriptions!A:G'
 
 /**
  * サブスクを subscriptions タブに追加する
- * カラム: サービス名 | 金額 | カテゴリ | 課金日 | 有効
+ * カラム: サービス名 | 金額 | カテゴリ | 課金日 | 有効 | 課金タイプ | 課金月
+ * 課金タイプ: "毎月" / "毎年"
+ * 課金月: 1〜12（毎年の場合のみ使用）
  */
-export async function addSubscription(env, { name, amount, category, billingDay }) {
+export async function addSubscription(env, { name, amount, category, billingDay, billingType = '毎月', billingMonth = '' }) {
   const token = await getAccessToken(env)
-  const values = [[name, amount, category, billingDay, 'TRUE']]
+  const values = [[name, amount, category, billingDay, 'TRUE', billingType, billingType === '毎年' ? billingMonth : '']]
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/${encodeURIComponent(SUBS_RANGE)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`
 
   const res = await fetch(url, {
@@ -231,14 +233,17 @@ export async function readSubscriptions(env) {
   const rows = data.values ?? []
 
   // 1行目はヘッダー。index + 2 がシート行番号
+  // 列F(billingType)が空の既存行は「毎月」として扱う（後方互換）
   return rows.slice(1)
-    .map(([name, amount, category, billingDay, enabled], index) => ({
+    .map(([name, amount, category, billingDay, enabled, billingType, billingMonth], index) => ({
       rowNumber: index + 2,
       name: name ?? '',
       amount: Number(amount) || 0,
       category: category ?? '',
       billingDay: Number(billingDay) || 1,
       enabled: enabled !== 'FALSE',
+      billingType: billingType || '毎月',
+      billingMonth: Number(billingMonth) || null,
     }))
     .filter((s) => s.enabled)
 }

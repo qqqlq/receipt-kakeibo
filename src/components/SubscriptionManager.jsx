@@ -15,7 +15,7 @@ export function SubscriptionManager() {
   const [isAdding, setIsAdding] = useState(false)
 
   // 追加フォームのstate
-  const [form, setForm] = useState({ name: '', amount: '', category: 'その他', billingDay: '' })
+  const [form, setForm] = useState({ name: '', amount: '', category: 'その他', billingType: '毎月', billingDay: '', billingMonth: '' })
 
   useEffect(() => {
     fetchSubscriptions()
@@ -39,6 +39,10 @@ export function SubscriptionManager() {
     if (!form.name || !form.amount || !form.billingDay) return
     const day = Number(form.billingDay)
     if (day < 1 || day > 31) return
+    if (form.billingType === '毎年') {
+      const m = Number(form.billingMonth)
+      if (m < 1 || m > 12) return
+    }
 
     setIsAdding(true)
     try {
@@ -46,9 +50,11 @@ export function SubscriptionManager() {
         name: form.name,
         amount: Number(form.amount),
         category: form.category,
+        billingType: form.billingType,
         billingDay: day,
+        billingMonth: form.billingType === '毎年' ? Number(form.billingMonth) : '',
       })
-      setForm({ name: '', amount: '', category: 'その他', billingDay: '' })
+      setForm({ name: '', amount: '', category: 'その他', billingType: '毎月', billingDay: '', billingMonth: '' })
       await fetchSubscriptions()
     } catch (err) {
       setError(err.message)
@@ -95,7 +101,9 @@ export function SubscriptionManager() {
               <div>
                 <p className="font-medium text-gray-800">{sub.name}</p>
                 <p className="text-sm text-gray-500">
-                  毎月{sub.billingDay}日 ·
+                  {sub.billingType === '毎年'
+                    ? `毎年${sub.billingMonth}月${sub.billingDay}日`
+                    : `毎月${sub.billingDay}日`} ·
                   <span className="ml-1 font-medium text-gray-700">¥{sub.amount.toLocaleString()}</span>
                   <span className="ml-2 text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">{sub.category}</span>
                 </p>
@@ -125,25 +133,46 @@ export function SubscriptionManager() {
             required
             className="min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+          <input
+            type="number"
+            placeholder="金額"
+            min="1"
+            value={form.amount}
+            onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
+            required
+            className="min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {/* 課金タイプ */}
           <div className="flex gap-2">
+            <select
+              value={form.billingType}
+              onChange={(e) => setForm((f) => ({ ...f, billingType: e.target.value, billingMonth: '' }))}
+              className="flex-1 min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="毎月">毎月</option>
+              <option value="毎年">毎年（年間）</option>
+            </select>
+            {form.billingType === '毎年' && (
+              <input
+                type="number"
+                placeholder="月"
+                min="1"
+                max="12"
+                value={form.billingMonth}
+                onChange={(e) => setForm((f) => ({ ...f, billingMonth: e.target.value }))}
+                required
+                className="w-16 min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            )}
             <input
               type="number"
-              placeholder="金額"
-              min="1"
-              value={form.amount}
-              onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
-              required
-              className="flex-1 min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <input
-              type="number"
-              placeholder="課金日"
+              placeholder="日"
               min="1"
               max="31"
               value={form.billingDay}
               onChange={(e) => setForm((f) => ({ ...f, billingDay: e.target.value }))}
               required
-              className="w-24 min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-16 min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <select

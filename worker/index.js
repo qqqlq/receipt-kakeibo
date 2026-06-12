@@ -133,10 +133,10 @@ async function handleDisableSubscription(request, env) {
 async function runDailySubscriptionRecord(env) {
   if (!checkSheetsEnv(env)) return
 
-  // JST の今日の「日」を取得
+  // JST の今日の日付を取得
   const jstDate = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Tokyo' }) // "2026-06-12"
-  const [year, month] = jstDate.split('-').map(Number)
-  const todayDay = Number(jstDate.split('-')[2])
+  const [year, month, dayStr] = jstDate.split('-').map(Number)
+  const todayDay = dayStr
 
   // 当月の最終日
   const lastDayOfMonth = new Date(year, month, 0).getDate()
@@ -144,15 +144,16 @@ async function runDailySubscriptionRecord(env) {
   const subscriptions = await readSubscriptions(env)
 
   for (const sub of subscriptions) {
-    // 課金日の月末補正: 課金日が当月最終日を超える場合は最終日に記録
+    // 課金日の月末補正
     const effectiveDay = Math.min(sub.billingDay, lastDayOfMonth)
-
     if (effectiveDay !== todayDay) continue
 
-    const date = jstDate
+    // 年間プランは課金月も一致するか確認
+    if (sub.billingType === '毎年' && sub.billingMonth !== month) continue
+
     await appendRow(env, {
       storeName: sub.name,
-      date,
+      date: jstDate,
       category: sub.category,
       items: [{ name: sub.name, price: sub.amount }],
       total: sub.amount,
