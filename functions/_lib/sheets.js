@@ -114,11 +114,11 @@ export async function getAccessToken(env) {
 
 /**
  * スプレッドシートの末尾に1行追記する
- * カラム順: 日付 | 店名 | カテゴリ | 品目 | 合計金額 | 消費税 | 記録日時
+ * カラム順: 日付 | 店名 | カテゴリ | 品目 | 合計金額 | 消費税 | 記録日時 | 支払方法
  * @param {Object} env
- * @param {Object} data - { date, storeName, category, items, total, tax }
+ * @param {Object} data - { date, storeName, category, items, total, tax, paymentMethod }
  */
-export async function appendRow(env, { date, storeName, category, items, total, tax }) {
+export async function appendRow(env, { date, storeName, category, items, total, tax, paymentMethod = '' }) {
   const token = await getAccessToken(env)
 
   // 品目を "品名 ×金額" 形式でカンマ連結
@@ -137,9 +137,9 @@ export async function appendRow(env, { date, storeName, category, items, total, 
     second: '2-digit',
   }).format(new Date())
 
-  const values = [[date, storeName, category, itemsSummary, total, tax, recordedAt]]
+  const values = [[date, storeName, category, itemsSummary, total, tax, recordedAt, paymentMethod]]
 
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/A:G:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/A:H:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`
 
   const res = await fetch(url, {
     method: 'POST',
@@ -196,17 +196,17 @@ export async function readRows(env) {
 
 // ─── サブスク管理 ────────────────────────────────────────────────────────────
 
-const SUBS_RANGE = 'subscriptions!A:G'
+const SUBS_RANGE = 'subscriptions!A:H'
 
 /**
  * サブスクを subscriptions タブに追加する
- * カラム: サービス名 | 金額 | カテゴリ | 課金日 | 有効 | 課金タイプ | 課金月
+ * カラム: サービス名 | 金額 | カテゴリ | 課金日 | 有効 | 課金タイプ | 課金月 | 支払方法
  * 課金タイプ: "毎月" / "毎年"
  * 課金月: 1〜12（毎年の場合のみ使用）
  */
-export async function addSubscription(env, { name, amount, category, billingDay, billingType = '毎月', billingMonth = '' }) {
+export async function addSubscription(env, { name, amount, category, billingDay, billingType = '毎月', billingMonth = '', paymentMethod = '' }) {
   const token = await getAccessToken(env)
-  const values = [[name, amount, category, billingDay, 'TRUE', billingType, billingType === '毎年' ? billingMonth : '']]
+  const values = [[name, amount, category, billingDay, 'TRUE', billingType, billingType === '毎年' ? billingMonth : '', paymentMethod]]
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${env.SPREADSHEET_ID}/values/${encodeURIComponent(SUBS_RANGE)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`
 
   const res = await fetch(url, {
@@ -235,7 +235,7 @@ export async function readSubscriptions(env) {
   // 1行目はヘッダー。index + 2 がシート行番号
   // 列F(billingType)が空の既存行は「毎月」として扱う（後方互換）
   return rows.slice(1)
-    .map(([name, amount, category, billingDay, enabled, billingType, billingMonth], index) => ({
+    .map(([name, amount, category, billingDay, enabled, billingType, billingMonth, paymentMethod], index) => ({
       rowNumber: index + 2,
       name: name ?? '',
       amount: Number(amount) || 0,
@@ -244,6 +244,7 @@ export async function readSubscriptions(env) {
       enabled: enabled !== 'FALSE',
       billingType: billingType || '毎月',
       billingMonth: Number(billingMonth) || null,
+      paymentMethod: paymentMethod ?? '',
     }))
     .filter((s) => s.enabled)
 }

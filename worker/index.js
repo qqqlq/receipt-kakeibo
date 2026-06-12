@@ -56,14 +56,14 @@ async function handleSaveToSheets(request, env) {
   try { body = await request.json() } catch {
     return errorResponse('リクエストボディが不正です', 400)
   }
-  const { storeName, date, category, items, total, tax } = body ?? {}
+  const { storeName, date, category, items, total, tax, paymentMethod } = body ?? {}
   if (!date || !storeName) return errorResponse('date と storeName は必須です', 400)
   if (!env.SPREADSHEET_ID || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY) {
     return errorResponse('Google Sheets の環境変数が設定されていません', 500)
   }
 
   try {
-    await appendRow(env, { storeName, date, category, items, total, tax })
+    await appendRow(env, { storeName, date, category, items, total, tax, paymentMethod })
     return jsonResponse({ success: true })
   } catch (err) {
     return errorResponse(`スプレッドシートへの保存に失敗しました: ${err.message}`)
@@ -102,10 +102,10 @@ async function handleAddSubscription(request, env) {
   try { body = await request.json() } catch {
     return errorResponse('リクエストボディが不正です', 400)
   }
-  const { name, amount, category, billingDay } = body ?? {}
+  const { name, amount, category, billingDay, billingType, billingMonth, paymentMethod } = body ?? {}
   if (!name || !amount || !billingDay) return errorResponse('name / amount / billingDay は必須です', 400)
   try {
-    await addSubscription(env, { name, amount: Number(amount), category: category ?? 'その他', billingDay: Number(billingDay) })
+    await addSubscription(env, { name, amount: Number(amount), category: category ?? 'その他', billingDay: Number(billingDay), billingType, billingMonth, paymentMethod })
     return jsonResponse({ success: true })
   } catch (err) {
     return errorResponse(`サブスク追加に失敗しました: ${err.message}`)
@@ -158,6 +158,7 @@ async function runDailySubscriptionRecord(env) {
       items: [{ name: sub.name, price: sub.amount }],
       total: sub.amount,
       tax: 0,
+      paymentMethod: sub.paymentMethod ?? '',
     })
   }
 }
