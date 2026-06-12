@@ -14,7 +14,7 @@ export function SubscriptionManager() {
   const [isAdding, setIsAdding] = useState(false)
 
   // 追加フォームのstate
-  const [form, setForm] = useState({ name: '', amount: '', category: 'その他', billingType: '毎月', billingDay: '', billingMonth: '' })
+  const [form, setForm] = useState({ name: '', amount: '', category: 'その他', billingType: '毎月', billingDay: '', billingMonth: '', paymentMethod: PAYMENT_METHODS[0] })
 
   useEffect(() => {
     fetchSubscriptions()
@@ -52,8 +52,9 @@ export function SubscriptionManager() {
         billingType: form.billingType,
         billingDay: day,
         billingMonth: form.billingType === '毎年' ? Number(form.billingMonth) : '',
+        paymentMethod: form.paymentMethod,
       })
-      setForm({ name: '', amount: '', category: 'その他', billingType: '毎月', billingDay: '', billingMonth: '' })
+      setForm({ name: '', amount: '', category: 'その他', billingType: '毎月', billingDay: '', billingMonth: '', paymentMethod: PAYMENT_METHODS[0] })
       await fetchSubscriptions()
     } catch (err) {
       setError(err.message)
@@ -105,6 +106,9 @@ export function SubscriptionManager() {
                     : `毎月${sub.billingDay}日`} ·
                   <span className="ml-1 font-medium text-gray-700">¥{sub.amount.toLocaleString()}</span>
                   <span className="ml-2 text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">{sub.category}</span>
+                  {sub.paymentMethod && (
+                    <span className="ml-1 text-xs bg-blue-50 text-blue-600 rounded-full px-2 py-0.5">{sub.paymentMethod}</span>
+                  )}
                 </p>
               </div>
               <button
@@ -181,6 +185,15 @@ export function SubscriptionManager() {
           >
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+          <select
+            value={form.paymentMethod}
+            onChange={(e) => setForm((f) => ({ ...f, paymentMethod: e.target.value }))}
+            className="min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            {PAYMENT_METHODS.map((m) => (
+              <option key={m} value={m}>{m}</option>
             ))}
           </select>
           <button

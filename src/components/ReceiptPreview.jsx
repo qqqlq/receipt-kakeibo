@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CATEGORIES } from '../lib/constants.js'
+import { CATEGORIES, PAYMENT_METHODS } from '../lib/constants.js'
 
 /**
  * レシート読み取り結果の確認・編集コンポーネント
@@ -13,6 +13,7 @@ export function ReceiptPreview({ data, onSave, onReset, isSaving }) {
   const [items, setItems] = useState(
     data.items?.length ? data.items : [{ name: '', price: 0 }]
   )
+  const [paymentMethod, setPaymentMethod] = useState(PAYMENT_METHODS[0])
 
   // data が変わったら再初期化（再読み取り後など）
   useEffect(() => {
@@ -22,6 +23,7 @@ export function ReceiptPreview({ data, onSave, onReset, isSaving }) {
       CATEGORIES.includes(data.category) ? data.category : 'その他'
     )
     setItems(data.items?.length ? data.items : [{ name: '', price: 0 }])
+    setPaymentMethod(PAYMENT_METHODS[0])
   }, [data])
 
   // 合計を自動計算
@@ -44,7 +46,7 @@ export function ReceiptPreview({ data, onSave, onReset, isSaving }) {
   }
 
   function handleSave() {
-    onSave({ storeName, date, category, items, total, tax: data.tax ?? 0 })
+    onSave({ storeName, date, category, items, total, tax: data.tax ?? 0, paymentMethod })
   }
 
   return (
@@ -84,6 +86,20 @@ export function ReceiptPreview({ data, onSave, onReset, isSaving }) {
         >
           {CATEGORIES.map((cat) => (
             <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* 支払方法 */}
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium text-gray-700">支払方法</label>
+        <select
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+          className="min-h-[44px] border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          {PAYMENT_METHODS.map((m) => (
+            <option key={m} value={m}>{m}</option>
           ))}
         </select>
       </div>
